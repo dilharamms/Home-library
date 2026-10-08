@@ -36,6 +36,12 @@ enum class AvailabilityFilter {
     LENT_OUT_ONLY
 }
 
+enum class ThemeMode(val title: String) {
+    SYSTEM("System"),
+    LIGHT("Light"),
+    DARK("Dark")
+}
+
 data class DashboardStats(
     val totalBooks: Int = 0,
     val totalCopies: Int = 0,
@@ -61,6 +67,22 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
 
     fun selectTab(tab: NavigationTab) {
         _currentTab.value = tab
+    }
+
+    // Theme Mode Preference
+    private val prefs = application.getSharedPreferences("home_library_prefs", android.content.Context.MODE_PRIVATE)
+    private val _themeMode = MutableStateFlow(
+        try {
+            ThemeMode.valueOf(prefs.getString("pref_theme_mode", ThemeMode.SYSTEM.name) ?: ThemeMode.SYSTEM.name)
+        } catch (_: Exception) {
+            ThemeMode.SYSTEM
+        }
+    )
+    val themeMode: StateFlow<ThemeMode> = _themeMode.asStateFlow()
+
+    fun setThemeMode(mode: ThemeMode) {
+        _themeMode.value = mode
+        prefs.edit().putString("pref_theme_mode", mode.name).apply()
     }
 
     // Search and Filters for Books

@@ -7,6 +7,8 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,10 +24,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Storage
@@ -35,7 +41,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +64,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.DashboardStats
+import com.example.ui.ThemeMode
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -66,6 +73,8 @@ import java.util.Locale
 @Composable
 fun SettingsDialog(
     stats: DashboardStats,
+    currentThemeMode: ThemeMode,
+    onThemeModeChange: (ThemeMode) -> Unit,
     onDismiss: () -> Unit,
     onExportBackup: suspend () -> String,
     onRestoreBackup: (jsonContent: String, replaceExisting: Boolean) -> Unit,
@@ -152,7 +161,81 @@ fun SettingsDialog(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Section 1: Database Backup & Restore (Core Requirement)
+                // Section 1: Appearance & Theme Mode (Production Requirement)
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Theme & Appearance",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Choose your preferred display appearance.",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        // System Default option
+                        FilterChip(
+                            selected = currentThemeMode == ThemeMode.SYSTEM,
+                            onClick = { onThemeModeChange(ThemeMode.SYSTEM) },
+                            label = { Text("System", fontSize = 12.sp) },
+                            leadingIcon = {
+                                Icon(Icons.Default.BrightnessAuto, contentDescription = null, modifier = Modifier.size(14.dp))
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("theme_system_option")
+                        )
+
+                        // Light Mode option
+                        FilterChip(
+                            selected = currentThemeMode == ThemeMode.LIGHT,
+                            onClick = { onThemeModeChange(ThemeMode.LIGHT) },
+                            label = { Text("Light", fontSize = 12.sp) },
+                            leadingIcon = {
+                                Icon(Icons.Default.LightMode, contentDescription = null, modifier = Modifier.size(14.dp))
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("theme_light_option")
+                        )
+
+                        // Dark Mode option
+                        FilterChip(
+                            selected = currentThemeMode == ThemeMode.DARK,
+                            onClick = { onThemeModeChange(ThemeMode.DARK) },
+                            label = { Text("Dark", fontSize = 12.sp) },
+                            leadingIcon = {
+                                Icon(Icons.Default.DarkMode, contentDescription = null, modifier = Modifier.size(14.dp))
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("theme_dark_option")
+                        )
+                    }
+                }
+
+                HorizontalDivider()
+
+                // Section 2: Database Backup & Restore
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -268,7 +351,7 @@ fun SettingsDialog(
 
                 HorizontalDivider()
 
-                // Section 2: Automated Background Notifications
+                // Section 3: Automated Background Notifications
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -288,7 +371,7 @@ fun SettingsDialog(
 
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Automated background alerts check loans every 6 hours and on device reboot for overdue books and returns due within 48h.",
+                        text = "Automated background alerts check loans periodically for overdue books and returns due within 48 hours.",
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -312,20 +395,20 @@ fun SettingsDialog(
 
                 HorizontalDivider()
 
-                // Section 3: App & Storage Info
+                // Section 4: Production App & Storage Info (Clean, professional, without developer jargon)
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        text = "Home Library v1.0",
+                        text = "Home Library",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "Storage: Local Room SQLite Database (Offline-first, private).",
+                        text = "Version 1.0 • Personal Library & Lending Manager",
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "Adaptive icon and Material 3 design configured.",
+                        text = "All library data is stored locally and securely on your device.",
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
                     )
@@ -364,7 +447,7 @@ fun SettingsDialog(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("How would you like to restore the data from the selected backup file?")
                     Text(
-                        "• Replace Database: Overwrites current books, members, and loans with the backup file.\n• Merge: Adds books and members from the backup without deleting existing items.",
+                        "• Replace All: Overwrites current books, members, and loans with the backup file.\n• Merge: Adds books and members from the backup without deleting existing items.",
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

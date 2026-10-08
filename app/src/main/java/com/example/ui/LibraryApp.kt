@@ -115,6 +115,7 @@ fun LibraryApp(
     val selectedRack by viewModel.selectedRack.collectAsStateWithLifecycle()
     val availabilityFilter by viewModel.availabilityFilter.collectAsStateWithLifecycle()
     val memberSearchQuery by viewModel.memberSearchQuery.collectAsStateWithLifecycle()
+    val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
 
     // Dialog States
     var showAddBookDialog by remember { mutableStateOf(false) }
@@ -423,6 +424,8 @@ fun LibraryApp(
     if (showSettingsDialog) {
         com.example.ui.components.SettingsDialog(
             stats = stats,
+            currentThemeMode = themeMode,
+            onThemeModeChange = { viewModel.setThemeMode(it) },
             onDismiss = { showSettingsDialog = false },
             onExportBackup = { viewModel.exportDatabaseBackup() },
             onRestoreBackup = { json, replaceExisting ->

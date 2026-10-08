@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Center safe area: (21, 21) to (87, 87) -->
+    <!-- Open Book Base -->
+    <path
+        android:fillColor="#F8FAFC"
+        android:pathData="M30,34c4.8,-2.7 11.4,-3 22,0v38c-10.6,-3 -17.2,-2.7 -22,0z" />
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M56,34c10.6,-3 17.2,-2.7 22,0v38c-4.8,-2.7 -11.4,-3 -22,0z" />
+    <!-- Book Spine & Binding -->
+    <path
+        android:fillColor="#CBD5E1"
+        android:pathData="M52.5,33.5h3v39h-3z" />
+    <!-- Golden Bookmark Ribbon -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M51,32h6v20l-3,-2.5l-3,2.5z" />
+    <!-- Book pages decorative lines -->
+    <path
+        android:strokeColor="#94A3B8"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M35,44h11 M35,50h11 M35,56h9 M62,44h11 M62,50h11 M64,56h9" />
+    <!-- Foundation Shelf Base -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M26,76h56v3.5c0,1.1 -0.9,2 -2,2h-52c-1.1,0 -2,-0.9 -2,-2z" />
+</vector>

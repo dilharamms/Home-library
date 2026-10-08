@@ -1,0 +1,6 @@
+{
+  "name": "Home Library",
+  "description": "Stock books, manage lending and member registration, search by author or genre, locate books by rack & shelf, track overdue books, and get notifications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

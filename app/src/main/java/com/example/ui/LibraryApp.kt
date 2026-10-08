@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -127,6 +128,8 @@ fun LibraryApp(
     var showLendDialog by remember { mutableStateOf(false) }
     var preselectedLendBookId by remember { mutableStateOf<Long?>(null) }
 
+    var showSettingsDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -173,6 +176,15 @@ fun LibraryApp(
                                 contentDescription = "Check Notifications"
                             )
                         }
+                    }
+                    IconButton(
+                        onClick = { showSettingsDialog = true },
+                        modifier = Modifier.testTag("app_bar_settings_action")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings & Database Backup"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -259,7 +271,8 @@ fun LibraryApp(
                         onReturnBook = { loanId, title -> viewModel.returnBook(loanId, title) },
                         onNavigateToBooks = { viewModel.selectTab(NavigationTab.BOOKS) },
                         onNavigateToLoans = { viewModel.selectTab(NavigationTab.LOANS) },
-                        onNavigateToRackLocator = { viewModel.selectTab(NavigationTab.RACK_LOCATOR) }
+                        onNavigateToRackLocator = { viewModel.selectTab(NavigationTab.RACK_LOCATOR) },
+                        onOpenSettings = { showSettingsDialog = true }
                     )
 
                     NavigationTab.BOOKS -> BooksScreen(
@@ -403,6 +416,19 @@ fun LibraryApp(
                 showLendDialog = false
                 preselectedLendBookId = null
             }
+        )
+    }
+
+    // Settings Dialog (Backup & Restore)
+    if (showSettingsDialog) {
+        com.example.ui.components.SettingsDialog(
+            stats = stats,
+            onDismiss = { showSettingsDialog = false },
+            onExportBackup = { viewModel.exportDatabaseBackup() },
+            onRestoreBackup = { json, replaceExisting ->
+                viewModel.restoreDatabase(json, replaceExisting)
+            },
+            onTestNotifications = { viewModel.checkAndSendNotificationsNow() }
         )
     }
 }

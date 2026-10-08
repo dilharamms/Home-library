@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="160dp"
+    android:height="160dp"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+    <!-- Outer Glow Circle -->
+    <path
+        android:fillColor="#1E293B"
+        android:pathData="M80,10A70,70 0 1,0 80,150A70,70 0 1,0 80,10Z" />
+    <path
+        android:fillColor="#334155"
+        android:pathData="M80,18A62,62 0 1,0 80,142A62,62 0 1,0 80,18Z" />
+
+    <!-- Open Book Pages (Left & Right) -->
+    <path
+        android:fillColor="#F8FAFC"
+        android:pathData="M42,52c7.2,-4 17.1,-4.5 33,0v54c-15.9,-4.5 -25.8,-4 -33,0z" />
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M85,52c15.9,-4.5 25.8,-4 33,0v54c-7.2,-4 -17.1,-4.5 -33,0z" />
+
+    <!-- Spine -->
+    <path
+        android:fillColor="#94A3B8"
+        android:pathData="M78,51h4v57h-4z" />
+
+    <!-- Golden Ribbon Bookmark -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M76,48h8v32l-4,-4l-4,4z" />
+
+    <!-- Decorative Text Line Stripes on Pages -->
+    <path
+        android:strokeColor="#CBD5E1"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M50,68h16 M50,78h16 M50,88h12 M94,68h16 M94,78h16 M98,88h12" />
+
+    <!-- Shelf Base -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M34,112h92v6c0,2.2 -1.8,4 -4,4h-84c-2.2,0 -4,-1.8 -4,-4z" />
+</vector>

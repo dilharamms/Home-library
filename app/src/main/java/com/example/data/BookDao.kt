@@ -58,6 +58,12 @@ interface BookDao {
     @Delete
     suspend fun deleteBook(book: Book)
 
+    @Query("SELECT * FROM books ORDER BY id ASC")
+    suspend fun getAllBooksSync(): List<Book>
+
+    @Query("DELETE FROM books")
+    suspend fun clearAllBooks()
+
     @Query("UPDATE books SET availableCopies = availableCopies - 1 WHERE id = :bookId AND availableCopies > 0")
     suspend fun decrementAvailableCopies(bookId: Long): Int
 

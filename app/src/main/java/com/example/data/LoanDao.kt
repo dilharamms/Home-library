@@ -127,6 +127,12 @@ interface LoanDao {
     @Query("SELECT COUNT(*) FROM loans WHERE status != 'RETURNED' AND dueDate < :currentTime")
     fun getOverdueLoansCount(currentTime: Long): Flow<Int>
 
+    @Query("SELECT * FROM loans ORDER BY id ASC")
+    suspend fun getAllLoansSync(): List<Loan>
+
+    @Query("DELETE FROM loans")
+    suspend fun clearAllLoans()
+
     @Query("SELECT * FROM loans WHERE id = :loanId")
     suspend fun getLoanById(loanId: Long): Loan?
 

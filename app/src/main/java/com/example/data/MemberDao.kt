@@ -41,6 +41,12 @@ interface MemberDao {
     @Delete
     suspend fun deleteMember(member: Member)
 
+    @Query("SELECT * FROM members ORDER BY id ASC")
+    suspend fun getAllMembersSync(): List<Member>
+
+    @Query("DELETE FROM members")
+    suspend fun clearAllMembers()
+
     @Query("UPDATE members SET activeLoansCount = activeLoansCount + 1 WHERE id = :memberId")
     suspend fun incrementActiveLoans(memberId: Long)
 

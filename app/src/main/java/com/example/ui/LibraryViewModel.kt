@@ -314,4 +314,21 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
             }
         }
     }
+
+    // Backup & Restore
+    suspend fun exportDatabaseBackup(): String {
+        return com.example.data.BackupRestoreManager.exportToJson(database)
+    }
+
+    fun restoreDatabase(jsonString: String, replaceExisting: Boolean) {
+        viewModelScope.launch {
+            val result = com.example.data.BackupRestoreManager.importFromJson(jsonString, database, replaceExisting)
+            result.onSuccess { stats ->
+                val mode = if (replaceExisting) "Restored" else "Merged"
+                _userMessage.emit("Database restored successfully! $mode ${stats.booksCount} books, ${stats.membersCount} members, ${stats.loansCount} loans.")
+            }.onFailure { error ->
+                _userMessage.emit("Restore failed: ${error.message ?: "Invalid backup file"}")
+            }
+        }
+    }
 }

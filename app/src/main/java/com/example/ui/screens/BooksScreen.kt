@@ -28,6 +28,8 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -41,7 +43,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -70,8 +77,56 @@ fun BooksScreen(
     onAvailabilityFilterChange: (AvailabilityFilter) -> Unit,
     onBookClick: (Book) -> Unit,
     onLendClick: (Book) -> Unit,
-    onAddBookClick: () -> Unit
+    onAddBookClick: () -> Unit,
+    onAddCategory: (String) -> Unit = {}
 ) {
+    var showAddCategoryDialog by remember { mutableStateOf(false) }
+    var newCategoryInput by remember { mutableStateOf("") }
+
+    if (showAddCategoryDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showAddCategoryDialog = false
+                newCategoryInput = ""
+            },
+            title = { Text("Add Book Category / Genre") },
+            text = {
+                OutlinedTextField(
+                    value = newCategoryInput,
+                    onValueChange = { newCategoryInput = it },
+                    label = { Text("Category Name") },
+                    placeholder = { Text("e.g. Science Fiction, Poetry") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (newCategoryInput.isNotBlank()) {
+                            onAddCategory(newCategoryInput.trim())
+                            onGenreSelect(newCategoryInput.trim())
+                            newCategoryInput = ""
+                            showAddCategoryDialog = false
+                        }
+                    }
+                ) {
+                    Text("Add Category")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showAddCategoryDialog = false
+                        newCategoryInput = ""
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -141,6 +196,14 @@ fun BooksScreen(
                             label = { Text(genre, fontSize = 12.sp) }
                         )
                     }
+                    FilterChip(
+                        selected = false,
+                        onClick = { showAddCategoryDialog = true },
+                        label = { Text("+ Category", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary) },
+                        leadingIcon = {
+                            Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(13.dp))
+                        }
+                    )
                 }
 
                 // Racks Row (Core location filter)

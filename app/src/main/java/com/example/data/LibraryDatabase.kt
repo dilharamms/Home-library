@@ -10,14 +10,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [Book::class, Member::class, Loan::class],
-    version = 1,
+    entities = [Book::class, Member::class, Loan::class, Category::class],
+    version = 2,
     exportSchema = false
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
     abstract fun memberDao(): MemberDao
     abstract fun loanDao(): LoanDao
+    abstract fun categoryDao(): CategoryDao
 
     companion object {
         @Volatile
@@ -30,6 +31,7 @@ abstract class LibraryDatabase : RoomDatabase() {
                     LibraryDatabase::class.java,
                     "home_library_database"
                 )
+                    .fallbackToDestructiveMigration()
                     .addCallback(LibraryDatabaseCallback(scope))
                     .build()
                 INSTANCE = instance
@@ -54,6 +56,23 @@ abstract class LibraryDatabase : RoomDatabase() {
             val bookDao = database.bookDao()
             val memberDao = database.memberDao()
             val loanDao = database.loanDao()
+            val categoryDao = database.categoryDao()
+
+            // 0. Initial Categories & Genres
+            val initialCategories = listOf(
+                Category(name = "Classic Fiction", colorHex = "#2563EB", isDefault = true),
+                Category(name = "Technology", colorHex = "#059669", isDefault = true),
+                Category(name = "History", colorHex = "#D97706", isDefault = true),
+                Category(name = "Philosophy", colorHex = "#7C3AED", isDefault = true),
+                Category(name = "Design", colorHex = "#DC2626", isDefault = true),
+                Category(name = "Dystopian Fiction", colorHex = "#475569", isDefault = true),
+                Category(name = "Sci-Fi", colorHex = "#EA580C", isDefault = true),
+                Category(name = "Science", colorHex = "#0284C7", isDefault = true),
+                Category(name = "Mystery & Thriller", colorHex = "#9333EA", isDefault = true),
+                Category(name = "Biography", colorHex = "#0D9488", isDefault = true),
+                Category(name = "Art & Literature", colorHex = "#E11D48", isDefault = true)
+            )
+            categoryDao.insertAll(initialCategories)
 
             val now = System.currentTimeMillis()
             val dayMs = 24L * 60 * 60 * 1000

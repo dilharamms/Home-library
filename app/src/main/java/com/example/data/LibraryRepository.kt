@@ -6,8 +6,18 @@ import kotlinx.coroutines.flow.combine
 class LibraryRepository(
     private val bookDao: BookDao,
     private val memberDao: MemberDao,
-    private val loanDao: LoanDao
+    private val loanDao: LoanDao,
+    private val categoryDao: CategoryDao
 ) {
+    // Categories & Genres
+    val allCategories: Flow<List<Category>> = categoryDao.getAllCategories()
+    val allCategoryNames: Flow<List<String>> = categoryDao.getAllCategoryNames()
+
+    suspend fun insertCategory(category: Category): Long = categoryDao.insertCategory(category)
+    suspend fun updateCategory(category: Category) = categoryDao.updateCategory(category)
+    suspend fun deleteCategory(category: Category) = categoryDao.deleteCategory(category)
+    suspend fun getAllCategoriesSync(): List<Category> = categoryDao.getAllCategoriesSync()
+
     // Books
     val allBooks: Flow<List<Book>> = bookDao.getAllBooks()
     val allGenres: Flow<List<String>> = bookDao.getAllGenres()

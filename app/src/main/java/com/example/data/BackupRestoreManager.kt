@@ -15,11 +15,26 @@ object BackupRestoreManager {
         val books = database.bookDao().getAllBooksSync()
         val members = database.memberDao().getAllMembersSync()
         val loans = database.loanDao().getAllLoansSync()
+        val categories = database.categoryDao().getAllCategoriesSync()
 
         val rootObj = JSONObject()
-        rootObj.put("version", 1)
+        rootObj.put("version", 2)
         rootObj.put("appName", "Home Library")
         rootObj.put("exportedAt", System.currentTimeMillis())
+
+        // Categories Array
+        val categoriesArray = JSONArray()
+        categories.forEach { cat ->
+            val cObj = JSONObject().apply {
+                put("id", cat.id)
+                put("name", cat.name)
+                put("colorHex", cat.colorHex)
+                put("description", cat.description)
+                put("isDefault", cat.isDefault)
+            }
+            categoriesArray.put(cObj)
+        }
+        rootObj.put("categories", categoriesArray)
 
         // Books Array
         val booksArray = JSONArray()
@@ -159,6 +174,30 @@ object BackupRestoreManager {
             val bookDao = database.bookDao()
             val memberDao = database.memberDao()
             val loanDao = database.loanDao()
+            val categoryDao = database.categoryDao()
+
+            if (rootObj.has("categories")) {
+                val catArray = rootObj.getJSONArray("categories")
+                val parsedCats = mutableListOf<Category>()
+                for (i in 0 until catArray.length()) {
+                    val c = catArray.getJSONObject(i)
+                    parsedCats.add(
+                        Category(
+                            id = if (replaceExisting) c.optLong("id", 0L) else 0L,
+                            name = c.getString("name"),
+                            colorHex = c.optString("colorHex", "#2563EB"),
+                            description = c.optString("description", ""),
+                            isDefault = c.optBoolean("isDefault", false)
+                        )
+                    )
+                }
+                if (replaceExisting) {
+                    categoryDao.clearAllCategories()
+                    categoryDao.insertAll(parsedCats)
+                } else {
+                    categoryDao.insertAll(parsedCats)
+                }
+            }
 
             if (replaceExisting) {
                 loanDao.clearAllLoans()

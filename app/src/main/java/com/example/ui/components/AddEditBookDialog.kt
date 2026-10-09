@@ -34,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -76,6 +77,8 @@ val DEFAULT_SHELVES = listOf("Shelf 1", "Shelf 2", "Shelf 3", "Shelf 4", "Top Sh
 @Composable
 fun AddEditBookDialog(
     initialBook: Book? = null,
+    categories: List<com.example.data.Category> = emptyList(),
+    onAddCategory: ((String) -> Unit)? = null,
     onDismiss: () -> Unit,
     onSave: (Book) -> Unit
 ) {
@@ -95,6 +98,14 @@ fun AddEditBookDialog(
     var genreExpanded by remember { mutableStateOf(false) }
     var rackExpanded by remember { mutableStateOf(false) }
     var shelfExpanded by remember { mutableStateOf(false) }
+
+    var isAddingCustomCategory by remember { mutableStateOf(false) }
+    var customCategoryName by remember { mutableStateOf("") }
+
+    val categoryOptions = remember(categories) {
+        val names = categories.map { it.name }.filter { it.isNotBlank() }
+        if (names.isEmpty()) DEFAULT_GENRES else (names + DEFAULT_GENRES).distinct().sorted()
+    }
 
     var titleError by remember { mutableStateOf(false) }
     var authorError by remember { mutableStateOf(false) }
@@ -164,7 +175,7 @@ fun AddEditBookDialog(
                     OutlinedTextField(
                         value = genre,
                         onValueChange = { genre = it },
-                        label = { Text("Genre") },
+                        label = { Text("Genre / Category *") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genreExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -174,7 +185,7 @@ fun AddEditBookDialog(
                         expanded = genreExpanded,
                         onDismissRequest = { genreExpanded = false }
                     ) {
-                        DEFAULT_GENRES.forEach { item ->
+                        categoryOptions.forEach { item ->
                             DropdownMenuItem(
                                 text = { Text(item) },
                                 onClick = {
@@ -182,6 +193,59 @@ fun AddEditBookDialog(
                                     genreExpanded = false
                                 }
                             )
+                        }
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("+ Create New Category", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+                                }
+                            },
+                            onClick = {
+                                genreExpanded = false
+                                isAddingCustomCategory = true
+                            }
+                        )
+                    }
+                }
+
+                if (isAddingCustomCategory) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedTextField(
+                                value = customCategoryName,
+                                onValueChange = { customCategoryName = it },
+                                placeholder = { Text("New Genre Name (e.g. Psychology)") },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Button(
+                                onClick = {
+                                    if (customCategoryName.isNotBlank()) {
+                                        val trimmed = customCategoryName.trim()
+                                        onAddCategory?.invoke(trimmed)
+                                        genre = trimmed
+                                        customCategoryName = ""
+                                        isAddingCustomCategory = false
+                                    }
+                                }
+                            ) {
+                                Text("Add")
+                            }
                         }
                     }
                 }

@@ -103,6 +103,7 @@ fun LibraryApp(
     val stats by viewModel.dashboardStats.collectAsStateWithLifecycle()
     val books by viewModel.filteredBooks.collectAsStateWithLifecycle()
     val genres by viewModel.genres.collectAsStateWithLifecycle()
+    val categories by viewModel.categories.collectAsStateWithLifecycle()
     val racks by viewModel.racks.collectAsStateWithLifecycle()
     val members by viewModel.filteredMembers.collectAsStateWithLifecycle()
     val allLoans by viewModel.allLoans.collectAsStateWithLifecycle()
@@ -293,7 +294,8 @@ fun LibraryApp(
                             preselectedLendBookId = it.id
                             showLendDialog = true
                         },
-                        onAddBookClick = { showAddBookDialog = true }
+                        onAddBookClick = { showAddBookDialog = true },
+                        onAddCategory = { viewModel.addCategory(it) }
                     )
 
                     NavigationTab.LOANS -> LoansScreen(
@@ -332,6 +334,8 @@ fun LibraryApp(
     if (showAddBookDialog || bookToEdit != null) {
         AddEditBookDialog(
             initialBook = bookToEdit,
+            categories = categories,
+            onAddCategory = { viewModel.addCategory(it) },
             onDismiss = {
                 showAddBookDialog = false
                 bookToEdit = null

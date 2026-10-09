@@ -58,7 +58,8 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
     private val repository = LibraryRepository(
         database.bookDao(),
         database.memberDao(),
-        database.loanDao()
+        database.loanDao(),
+        database.categoryDao()
     )
 
     // Navigation Tab
@@ -131,9 +132,16 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // All Genres and Racks
-    val genres: StateFlow<List<String>> = repository.allGenres
+    // All Categories, Genres and Racks
+    val categories: StateFlow<List<com.example.data.Category>> = repository.allCategories
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val genres: StateFlow<List<String>> = combine(
+        repository.allCategoryNames,
+        repository.allGenres
+    ) { catNames, bookGenres ->
+        (catNames + bookGenres).filter { it.isNotBlank() }.distinct().sorted()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val racks: StateFlow<List<String>> = repository.allRacks
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -262,6 +270,32 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             repository.deleteMember(member)
             _userMessage.emit("Member ${member.name} removed")
+        }
+    }
+
+    // Category / Genre Actions
+    fun addCategory(name: String, colorHex: String = "#2563EB", description: String = "") {
+        if (name.isBlank()) return
+        viewModelScope.launch {
+            val cat = com.example.data.Category(
+                name = name.trim(),
+                colorHex = colorHex,
+                description = description.trim(),
+                isDefault = false
+            )
+            val id = repository.insertCategory(cat)
+            if (id > 0) {
+                _userMessage.emit("Added new category '$name'")
+            } else {
+                _userMessage.emit("Category '$name' already exists")
+            }
+        }
+    }
+
+    fun deleteCategory(category: com.example.data.Category) {
+        viewModelScope.launch {
+            repository.deleteCategory(category)
+            _userMessage.emit("Removed category '${category.name}'")
         }
     }
 
